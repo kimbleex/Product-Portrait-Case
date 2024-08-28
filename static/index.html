@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic画像可视化</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body >
+    <h1>Topic画像可视化</h1>
+    <select id="userSelect">
+        <option value="">请选择话题</option>
+        <!-- 更多用户选项... -->
+    </select>
+
+    <div style="width: 60%;">
+        <canvas id="country_scores"></canvas>
+    </div>
+    <div style="width: 60%;">
+        <canvas id="related_queries"></canvas>
+    </div>
+    <div style="width: 60%; ">
+        <canvas id="related_entities" ></canvas>
+    </div>
+
+
+    <script>
+        //获取数据keys生成下拉框
+        window.onload = function() {
+            fetch(`/topic_keys`)
+                .then(response => response.json())
+                .then(data => {
+                    
+                    let select = document.getElementById('userSelect');
+                    for(let i = 0; i < data.length; i++){
+                        let option = document.createElement('option');
+                        option.value = data[i];
+                        option.text = data[i];
+                        select.appendChild(option);
+                    }
+                })
+        }
+
+        document.getElementById('userSelect').addEventListener('change', function() {
+            const selectedUser = this.value;
+            if (selectedUser) {
+                fetch(`/data/${selectedUser}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        updateChart_related_queries(data[2]);
+                        updateChart_related_entities(data[1]);
+                        updateChart_country_scores(data[0]);
+                        
+                        
+                        // updateChart_(data);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+        });
+
+        let country_chart = related_entities = related_queries = null;
+        function updateChart_country_scores(data) {
+            if(country_chart){
+                country_chart.destroy();
+            }
+            let canvas1 = document.getElementById('country_scores');
+            let ctx1 = canvas1.getContext('2d');
+            country_chart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data),
+                    datasets: [{
+                        label: 'country_scores',
+                        data: Object.values(data),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    title:{
+                        display:true,
+                        text:'Country Scores',
+                        fontSize:50,
+                    },
+                    plugins:{
+                        title:{
+                            display:true,
+                            text:'Country Scores',
+                            fontSize:50
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        },
+                },
+            }
+            });
+        };
+
+        function updateChart_related_entities(data) {
+            if(related_entities){
+                related_entities.destroy();
+            }
+            let canvas2 = document.getElementById('related_entities');
+            let ctx2 = canvas2.getContext('2d');
+            // 2.scale(canvas_.style.width/actualWidth, canvas_.style.height/actualHeight);
+            related_entities = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data),
+                    datasets: [{
+                        label: 'realted_entities',
+                        data: Object.values(data),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    plugins:{
+                    title:{
+                        display:true,
+                        text:'Related Entities'
+                    }},
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        },
+                    
+                    }
+                }
+            });
+        };
+        
+        function updateChart_related_queries(data) {
+            if(related_queries){
+                related_queries.destroy();
+            }
+            let canvas3 = document.getElementById('related_queries');
+            let ctx3 = canvas3.getContext('2d');
+            // ctx.scale(canvas_.style.width/actualWidth, canvas_.style.height/actualHeight);
+            related_queries = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data),
+                    datasets: [{
+                        label: 'realted_queries',
+                        data: Object.values(data),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    plugins:{
+                        title:{
+                        display:true,
+                        text:'Related Queries'
+                    }
+                    },
+                    
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    
+                }
+            });
+        };
+    </script>
+</body>
+</html>

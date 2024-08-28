@@ -4,6 +4,9 @@
 
 ### 确保已经安装了Fastapi后端框架  
 
-[sample1](./pic/sample1.png)
+web端会根据JSON中的数据的key来自动生成下拉框
+<!-- ![sample1](./pic/sample1.png) -->
 
-[sample2](./pic/sample2.png)
+
+点击后自动绘制图表
+<!-- ![sample2](./pic/sample2.png) -->
